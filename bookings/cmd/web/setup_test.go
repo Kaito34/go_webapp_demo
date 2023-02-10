@@ -7,13 +7,12 @@ import (
 )
 
 func TestMain(m *testing.M) {
-    
-    
-    os.Exit(m.Run())
+
+	os.Exit(m.Run())
 }
 
-type myHandler struct {}
+type myHandler struct{}
 
-func (mh *myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)  {
+func (mh *myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 }

@@ -3,30 +3,33 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
+	"github.com/alexedwards/scs/v2"
+	"github.com/tsawler/bookings-app/internal/config"
+	"github.com/tsawler/bookings-app/internal/handlers"
+	"github.com/tsawler/bookings-app/internal/helpers"
+	"github.com/tsawler/bookings-app/internal/models"
+	"github.com/tsawler/bookings-app/internal/render"
 	"log"
 	"net/http"
+	"os"
 	"time"
-
-	"github.com/Kaito34/go_webapp_demo/internal/config"
-	"github.com/Kaito34/go_webapp_demo/internal/handlers"
-	"github.com/Kaito34/go_webapp_demo/internal/models"
-	"github.com/Kaito34/go_webapp_demo/internal/render"
-	"github.com/alexedwards/scs/v2"
 )
 
 const portNumber = ":8080"
 
 var app config.AppConfig
 var session *scs.SessionManager
+var infoLog *log.Logger
+var errorLog *log.Logger
 
+// main is the main function
 func main() {
 	err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
-	
-	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
-	// _ = http.ListenAndServe(portNumber, nil)
+
+	fmt.Println(fmt.Sprintf("Staring application on port %s", portNumber))
 
 	srv := &http.Server{
 		Addr:    portNumber,
@@ -34,16 +37,25 @@ func main() {
 	}
 
 	err = srv.ListenAndServe()
-	log.Fatal(err)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func run () error {
+func run() error {
 	// what am I going to put in the session
 	gob.Register(models.Reservation{})
 
 	// change this to true when in production
 	app.InProduction = false
 
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
+	// set up the session
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
 	session.Cookie.Persist = true
@@ -64,7 +76,7 @@ func run () error {
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&app)
+	helpers.NewHelpers(&app)
 
 	return nil
-
 }

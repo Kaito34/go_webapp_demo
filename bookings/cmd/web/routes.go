@@ -1,12 +1,11 @@
 package main
 
 import (
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/tsawler/bookings-app/internal/config"
+	"github.com/tsawler/bookings-app/internal/handlers"
 	"net/http"
-
-	"github.com/Kaito34/go_webapp_demo/internal/config"
-	"github.com/Kaito34/go_webapp_demo/internal/handlers"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 func routes(app *config.AppConfig) http.Handler {
@@ -33,5 +32,6 @@ func routes(app *config.AppConfig) http.Handler {
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
+
 	return mux
 }
