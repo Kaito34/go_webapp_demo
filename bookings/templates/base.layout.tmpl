@@ -152,6 +152,18 @@
             })
         }
 
+        {{with .Error}}
+        nofity("{{.}}", "error")
+        {{end}}
+
+        {{with .Flash}}
+        nofity("{{.}}", "success")
+        {{end}}
+
+        {{with .Warning}}
+        nofity("{{.}}", "warning")
+        {{end}}
+
         function Prompt() {
             let toast = function (c) {
                 const {
